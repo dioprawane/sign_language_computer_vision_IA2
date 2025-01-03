@@ -26,4 +26,3 @@ venv/
 
 # Ignorer les fichiers Markdown et documents
 *.md
-*.txt
