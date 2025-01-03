@@ -9,3 +9,4 @@ scikit-learn~=1.5.2
 numpy
 pyttsx3~=2.98
 pillow~=10.4.0
+gunicorn==20.1.0
