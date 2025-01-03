@@ -8,7 +8,7 @@ utils/
 
 # Ignorer les fichiers suivants 
 models/
-
+templates/
 src/
 
 src/test.py
@@ -26,3 +26,6 @@ venv/
 
 # Ignorer les fichiers Markdown et documents
 *.md
+
+app.py
+.gitignore
