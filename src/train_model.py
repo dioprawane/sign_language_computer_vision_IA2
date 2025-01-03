@@ -60,7 +60,7 @@ if __name__ == "__main__":
     # Encoder les labels
     le = LabelEncoder()
     labels = le.fit_transform(labels)
-    np.save("../models/label_classes_V5.npy", le.classes_)
+    np.save("../models/label_classes_V6.npy", le.classes_)
 
     # Diviser les données en entraînement et test
     X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.2, random_state=42)
@@ -70,8 +70,8 @@ if __name__ == "__main__":
     history = model.fit(X_train, y_train, epochs=15, batch_size=16, validation_data=(X_test, y_test))
 
     # Sauvegarder le modèle
-    model.save("../models/gesture_model_V5.h5")
-    print("Modèle sauvegardé sous ../models/gesture_model_V5.h5")
+    model.save("../models/gesture_model_V6.h5")
+    print("Modèle sauvegardé sous ../models/gesture_model_V6.h5")
 
     # Visualiser les performances
     fig = plt.figure()

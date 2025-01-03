@@ -1,3 +1,20 @@
-# ignorer les environnements
+# ignorer les dossiers suivants
 venv/
 datasets/
+
+# Ignorer les fichiers suivants 
+models/gesture_model_V0.h5
+models/label_classes_V0.npy
+models/gesture_model_V1.h5
+models/label_classes_V1.npy
+models/gesture_model_V2.h5
+models/label_classes_V2.npy
+models/gesture_model_V3.h5
+models/label_classes_V3.npy
+models/gesture_model_V4.h5
+models/label_classes_V4.npy
+models/gesture_recognition_cnn.h5
+
+src/test.py
+
+utils/notes.md
