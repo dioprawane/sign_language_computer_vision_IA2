@@ -1,0 +1,29 @@
+# Ignorer les datasets volumineux
+datasets/
+data/
+gesture_data/
+processed_data/
+images/
+utils/
+
+# Ignorer les fichiers suivants 
+models/
+
+src/
+
+src/test.py
+src/__pycache__
+__pycache__/
+
+# Ignorer les fichiers générés
+*.pyc
+__pycache__/
+*.log
+*.sqlite3
+
+# Ignorer les environnements virtuels locaux
+venv/
+
+# Ignorer les fichiers Markdown et documents
+*.md
+*.txt
