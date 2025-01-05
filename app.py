@@ -1,4 +1,5 @@
 from flask import Flask, render_template, Response, jsonify, request
+from flask_socketio import SocketIO, emit
 import cv2
 import threading
 import numpy as np
@@ -7,9 +8,11 @@ import mediapipe as mp
 import pyttsx3
 import time
 import os
+import base64
 
-# Flask setup
+# Flask setup and socketio setup
 app = Flask(__name__)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Paths for the model and classes
 MODEL_PATH = os.path.join("models", "gesture_model_V5.h5")
@@ -34,6 +37,80 @@ is_paused = False  # Variable pour gérer l'état de pause
 
 # Capture video from webcam
 cap = cv2.VideoCapture(0)
+
+def process_frame(frame):
+    """Process the frame and update global variables based on predictions."""
+    global word_buffer, sentence, current_alphabet, last_detection_time, is_paused
+
+    if is_paused:
+        return
+
+    frame = cv2.flip(frame, 1)
+    rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    results = hands.process(rgb_frame)
+
+    current_time = time.time()
+    if results.multi_hand_landmarks and (current_time - last_detection_time >= RECOGNITION_DELAY):
+        for hand_landmarks in results.multi_hand_landmarks:
+            # Extract landmarks and predict
+            landmarks = [[lm.x, lm.y, lm.z] for lm in hand_landmarks.landmark]
+            try:
+                prediction = model.predict(np.array([np.array(landmarks).flatten()]))
+                predicted_class = classes[np.argmax(prediction)]
+
+                # Update global variables
+                current_alphabet = predicted_class.strip().lower()
+                if current_alphabet in [" ", "espace"]:
+                    sentence += word_buffer + " "
+                    word_buffer = ""
+                elif current_alphabet == "point":
+                    word_buffer += "."
+                else:
+                    word_buffer += current_alphabet
+
+                last_detection_time = current_time
+            except Exception as e:
+                print(f"Error in prediction: {e}")
+
+
+@socketio.on('frame')
+def handle_frame(data):
+    """Handle the frame received from the client."""
+    global current_alphabet, word_buffer, sentence
+
+    # Decode the base64 image
+    frame_data = data.split(",")[1]
+    frame = np.frombuffer(base64.b64decode(frame_data), dtype=np.uint8)
+    frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
+
+    # Process the frame
+    process_frame(frame)
+
+    # Send updated status to the client
+    emit('update_status', {
+        'current_alphabet': current_alphabet,
+        'word_buffer': word_buffer,
+        'sentence': sentence
+    })
+
+@socketio.on('toggle_pause')
+def toggle_pause():
+    """Toggle pause/play for processing."""
+    global is_paused
+    is_paused = not is_paused
+    status = "paused" if is_paused else "playing"
+    emit('status', {'status': status})
+
+
+@socketio.on('reset')
+def reset():
+    """Reset the detected text."""
+    global word_buffer, sentence, current_alphabet
+    word_buffer = ""
+    sentence = ""
+    current_alphabet = "N/A"
+    emit('reset_complete', {'status': 'reset'})
+
 
 def speak_text(text):
     """Fonction pour parler le texte donné via pyttsx3"""
@@ -163,3 +240,4 @@ def get_status():
 
 if __name__ == '__main__':
     app.run(debug=True)
+    socketio.run(app, debug=True)

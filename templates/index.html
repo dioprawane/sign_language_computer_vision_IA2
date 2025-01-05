@@ -11,6 +11,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
 
     <style>
         body {
@@ -249,6 +250,46 @@
         });
 
         setInterval(updateStatus, 500);
+    </script>
+
+    <script>
+        const videoElement = document.getElementById('video');
+        const canvas = document.createElement('canvas');
+        const socket = io();
+
+        // Start the video stream
+        async function startVideo() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                videoElement.srcObject = stream;
+
+                const context = canvas.getContext('2d');
+                canvas.width = 640;
+                canvas.height = 480;
+
+                setInterval(() => {
+                    context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+                    const frameData = canvas.toDataURL('image/jpeg');
+                    socket.emit('frame', frameData);
+                }, 100);
+            } catch (err) {
+                console.error('Erreur lors de l’accès à la caméra :', err);
+            }
+        }
+
+        // Update status from the server
+        socket.on('update_status', (data) => {
+            document.getElementById('current_alphabet').textContent = data.current_alphabet || 'N/A';
+            document.getElementById('word_buffer').textContent = data.word_buffer || 'N/A';
+            document.getElementById('sentence').textContent = data.sentence || 'N/A';
+        });
+
+        // Pause and reset
+        document.getElementById('pauseBtn').addEventListener('click', () => socket.emit('toggle_pause'));
+        document.getElementById('resetBtn').addEventListener('click', () => socket.emit('reset'));
+
+        // Start the video
+        startVideo();
     </script>
 </body>
 </html>
