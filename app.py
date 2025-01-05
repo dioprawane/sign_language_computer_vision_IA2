@@ -1,5 +1,6 @@
 from flask import Flask, render_template, Response, jsonify, request
 from flask_socketio import SocketIO, emit
+from flask_cors import CORS
 import cv2
 import threading
 import numpy as np
@@ -12,6 +13,8 @@ import base64
 
 # Flask setup and socketio setup
 app = Flask(__name__)
+# Ajoutez cette ligne après la configuration de votre app Flask
+CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Paths for the model and classes
