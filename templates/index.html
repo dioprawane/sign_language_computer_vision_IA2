@@ -307,7 +307,7 @@
             // etc.
           })
           .catch(err => console.error('Erreur lors de l’envoi du flux WebRTC:', err));
-        }, 600); // Envoi toutes les 600 ms (ajustez la fréquence si nécessaire)
+        }, 5000); // Envoi toutes les 600 ms (ajustez la fréquence si nécessaire)
       } catch (err) {
         console.error('Erreur lors de l’accès à la caméra :', err);
       }
