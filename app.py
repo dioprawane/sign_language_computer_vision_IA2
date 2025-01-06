@@ -11,7 +11,8 @@ from tensorflow.keras.models import load_model
 import pyttsx3
 
 app = Flask(__name__)
-CORS(app)  # Autoriser les requêtes cross-origin (pour un front séparé)
+CORS(app, resources={r"/*": {"origins": "*"}})
+#CORS(app)  # Autoriser les requêtes cross-origin (pour un front séparé)
 
 # ------------------ Chargement du modèle et config ------------------
 
