@@ -182,7 +182,7 @@
         .catch(error => console.error('Erreur lors de la mise à jour des données:', error));
     }
 
-    setInterval(updateStatus, 500);
+    setInterval(updateStatus, 1000);
 
     // Bascule le statut "pause" / "reprendre"
     function togglePause() {
